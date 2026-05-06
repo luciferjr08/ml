@@ -1,0 +1,40 @@
+import pandas as pd 
+import numpy as np 
+from sklearn.datasets import load_iris 
+from sklearn.preprocessing import StandardScaler 
+from sklearn.cluster import KMeans 
+from sklearn.metrics import silhouette_score 
+from sklearn.model_selection import train_test_split 
+from sklearn.ensemble import RandomForestClassifier 
+from sklearn.metrics import accuracy_score, classification_report 
+import matplotlib.pyplot as plt  
+iris = load_iris() 
+df = pd.DataFrame(iris.data, columns=iris.feature_names)  
+scaler = StandardScaler() 
+scaled_data = scaler.fit_transform(df) 
+kmeans = KMeans(n_clusters=3, random_state=42) 
+clusters = kmeans.fit_predict(scaled_data) 
+df['Cluster'] = clusters  
+sil_score = silhouette_score(scaled_data, clusters) 
+print("Silhouette Score:", sil_score)  
+plt.figure(figsize=(6,4))
+plt.scatter(df.iloc[:,0], df.iloc[:,1], c=df['Cluster'], cmap='viridis')
+plt.title("K-Means Clustering on IRIS Dataset")
+plt.xlabel("Sepal Length")
+plt.ylabel("Sepal Width")
+plt.colorbar(label='Cluster')
+plt.show() 
+plt.title("K-Means Clustering on IRIS Dataset") 
+plt.xlabel("Sepal Length") 
+plt.ylabel("Sepal Width") 
+plt.show() 
+X = df.drop('Cluster', axis=1) 
+y = df['Cluster'] 
+X_train, X_test, y_train, y_test = train_test_split( 
+    X, y, test_size=0.3, random_state=42 
+) 
+model = RandomForestClassifier(random_state=42) 
+model.fit(X_train, y_train) 
+y_pred = model.predict(X_test) 
+print("Accuracy:", accuracy_score(y_test, y_pred)) 
+print(classification_report(y_test, y_pred))

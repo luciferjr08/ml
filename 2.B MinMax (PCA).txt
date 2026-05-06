@@ -1,0 +1,19 @@
+import numpy as np 
+import pandas as pd 
+from sklearn.datasets import load_iris 
+from sklearn.preprocessing import MinMaxScaler 
+from sklearn.decomposition import PCA  
+iris = load_iris() 
+df = pd.DataFrame(iris.data, columns=iris.feature_names) 
+df.iloc[5:10, 2] = np.nan 
+df.fillna(df.mean(), inplace=True) 
+scaler = MinMaxScaler() 
+scaled_data = scaler.fit_transform(df)  
+pca = PCA(n_components=2) 
+pca_data = pca.fit_transform(scaled_data)  
+pca_df = pd.DataFrame( 
+    pca_data, 
+    columns=['Principal Component 1', 'Principal Component 2'] 
+) 
+print("Dataset after Min-Max Scaling and PCA:") 
+print(pca_df.head())
