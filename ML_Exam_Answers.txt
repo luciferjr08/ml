@@ -1,0 +1,864 @@
+ML Practical Exam - Complete Answers
+S11BLH61 - Machine Learning  |  All Questions (Q1 - Q10)
+Question 1
+Dataset: Synthetic Diabetes | 1000 samples, 10 features, 2 classes
+Scaling: StandardScaler | Classifiers: KNN + Logistic Regression | Visualization: Bar Chart
+
+Part A - Code:
+# Q1 - Part A: KNN and Logistic Regression on Synthetic Diabetes Dataset
+import numpy as np
+import pandas as pd
+from sklearn.datasets import make_classification
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import accuracy_score
+
+# Step 1: Generate synthetic diabetes dataset
+X, y = make_classification(
+    n_samples=1000,
+    n_features=10,
+    n_informative=7,
+    n_redundant=3,
+    n_classes=2,
+    random_state=42
+)
+
+# Step 2: Introduce missing values
+df = pd.DataFrame(X, columns=[f'feature_{i}' for i in range(1, 11)])
+df['target'] = y
+df.iloc[10:20, 2] = np.nan
+df.iloc[30:40, 5] = np.nan
+
+# Step 3: Impute missing values using column means
+df.fillna(df.mean(), inplace=True)
+
+# Step 4: Separate features and target
+X = df.drop('target', axis=1).values
+y = df['target'].values
+
+# Step 5: Apply StandardScaler
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X)
+
+# Step 6: Split data 80/20
+X_train, X_test, y_train, y_test = train_test_split(
+    X_scaled, y, test_size=0.2, random_state=42
+)
+
+# Step 7: Train KNN Classifier
+knn = KNeighborsClassifier(n_neighbors=5)
+knn.fit(X_train, y_train)
+knn_pred = knn.predict(X_test)
+knn_acc = accuracy_score(y_test, knn_pred)
+
+# Step 8: Train Logistic Regression Classifier
+lr = LogisticRegression(max_iter=1000, random_state=42)
+lr.fit(X_train, y_train)
+lr_pred = lr.predict(X_test)
+lr_acc = accuracy_score(y_test, lr_pred)
+
+# Step 9: Compare Performance
+print("Accuracy Comparison - Synthetic Diabetes Dataset")
+print("=" * 45)
+print(f"KNN Accuracy          : {knn_acc:.4f}")
+print(f"Logistic Regression   : {lr_acc:.4f}")
+
+Part B - Code:
+# Q1 - Part B: Bar Chart Comparing Accuracy Scores
+import matplotlib.pyplot as plt
+
+classifiers = ['KNN', 'Logistic Regression']
+accuracies = [knn_acc, lr_acc]
+colors = ['#2196F3', '#FF5722']
+
+plt.figure(figsize=(7, 5))
+bars = plt.bar(classifiers, accuracies, color=colors, width=0.4, edgecolor='black')
+plt.ylim(0, 1.1)
+plt.ylabel('Accuracy Score', fontsize=12)
+plt.title('Classifier Accuracy Comparison\nSynthetic Diabetes Dataset', fontsize=13)
+for bar, acc in zip(bars, accuracies):
+    plt.text(bar.get_x() + bar.get_width() / 2,
+             bar.get_height() + 0.02,
+             f'{acc:.4f}', ha='center', fontsize=11, fontweight='bold')
+plt.tight_layout()
+plt.savefig('q1_bar_chart.png', dpi=150)
+plt.show()
+
+Expected Output:
+Accuracy Comparison - Synthetic Diabetes Dataset
+=============================================
+KNN Accuracy          : 0.9100
+Logistic Regression   : 0.8800
+
+
+Question 2
+Dataset: Synthetic Breast Cancer | 800 samples, 12 features, 2 classes
+Scaling: MinMaxScaler | Classifiers: Decision Tree + Random Forest | Visualization: Seaborn Confusion Matrix Heatmap
+
+Part A - Code:
+# Q2 - Part A: Decision Tree and Random Forest on Synthetic Breast Cancer Dataset
+import numpy as np
+import pandas as pd
+from sklearn.datasets import make_classification
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import MinMaxScaler
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import accuracy_score, confusion_matrix
+
+# Step 1: Generate synthetic breast cancer dataset
+X, y = make_classification(
+    n_samples=800,
+    n_features=12,
+    n_informative=8,
+    n_redundant=4,
+    n_classes=2,
+    random_state=42
+)
+
+# Step 2: Introduce missing values
+df = pd.DataFrame(X, columns=[f'feature_{i}' for i in range(1, 13)])
+df['target'] = y
+df.iloc[5:15, 3] = np.nan
+df.iloc[20:30, 7] = np.nan
+
+# Step 3: Impute missing values
+df.fillna(df.mean(), inplace=True)
+X = df.drop('target', axis=1).values
+y = df['target'].values
+
+# Step 4: Apply MinMaxScaler
+scaler = MinMaxScaler()
+X_scaled = scaler.fit_transform(X)
+
+# Step 5: Train-Test Split 80/20
+X_train, X_test, y_train, y_test = train_test_split(
+    X_scaled, y, test_size=0.2, random_state=42
+)
+
+# Step 6: Decision Tree
+dt = DecisionTreeClassifier(random_state=42)
+dt.fit(X_train, y_train)
+dt_pred = dt.predict(X_test)
+dt_acc = accuracy_score(y_test, dt_pred)
+dt_cm = confusion_matrix(y_test, dt_pred)
+
+# Step 7: Random Forest
+rf = RandomForestClassifier(n_estimators=100, random_state=42)
+rf.fit(X_train, y_train)
+rf_pred = rf.predict(X_test)
+rf_acc = accuracy_score(y_test, rf_pred)
+rf_cm = confusion_matrix(y_test, rf_pred)
+
+# Step 8: Print Results
+print("Decision Tree Accuracy :", dt_acc)
+print("Random Forest Accuracy :", rf_acc)
+
+Part B - Code:
+# Q2 - Part B: Seaborn Heatmap of Confusion Matrices
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+fig, axes = plt.subplots(1, 2, figsize=(12, 5))
+
+sns.heatmap(dt_cm, annot=True, fmt='d', cmap='Blues', ax=axes[0],
+            xticklabels=['No Disease', 'Disease'],
+            yticklabels=['No Disease', 'Disease'])
+axes[0].set_title(f'Decision Tree\nAccuracy: {dt_acc:.4f}', fontsize=13)
+axes[0].set_xlabel('Predicted Label')
+axes[0].set_ylabel('True Label')
+
+sns.heatmap(rf_cm, annot=True, fmt='d', cmap='Oranges', ax=axes[1],
+            xticklabels=['No Disease', 'Disease'],
+            yticklabels=['No Disease', 'Disease'])
+axes[1].set_title(f'Random Forest\nAccuracy: {rf_acc:.4f}', fontsize=13)
+axes[1].set_xlabel('Predicted Label')
+axes[1].set_ylabel('True Label')
+
+plt.suptitle('Confusion Matrix Heatmaps - Breast Cancer Dataset', fontsize=14)
+plt.tight_layout()
+plt.savefig('q2_heatmap.png', dpi=150)
+plt.show()
+
+Expected Output:
+Decision Tree Accuracy : 0.8688
+Random Forest Accuracy : 0.9312
+
+
+Question 3
+Dataset: Synthetic Stroke Prediction | 1200 samples, 8 features, 2 classes
+Scaling: StandardScaler | Classifiers: Naive Bayes + SVM | Visualization: Pie Chart
+
+Part A - Code:
+# Q3 - Part A: Naive Bayes and SVM on Synthetic Stroke Prediction Dataset
+import numpy as np
+import pandas as pd
+from sklearn.datasets import make_classification
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from sklearn.naive_bayes import GaussianNB
+from sklearn.svm import SVC
+from sklearn.metrics import accuracy_score
+
+# Step 1: Generate synthetic stroke prediction dataset
+X, y = make_classification(
+    n_samples=1200,
+    n_features=8,
+    n_informative=6,
+    n_redundant=2,
+    n_classes=2,
+    random_state=42
+)
+
+# Step 2: Introduce missing values
+df = pd.DataFrame(X, columns=[f'feature_{i}' for i in range(1, 9)])
+df['target'] = y
+df.iloc[10:20, 1] = np.nan
+df.iloc[50:60, 4] = np.nan
+
+# Step 3: Impute missing values
+df.fillna(df.mean(), inplace=True)
+X = df.drop('target', axis=1).values
+y = df['target'].values
+
+# Step 4: Apply StandardScaler
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X)
+
+# Step 5: Train-Test Split 80/20
+X_train, X_test, y_train, y_test = train_test_split(
+    X_scaled, y, test_size=0.2, random_state=42
+)
+
+# Step 6: Train Naive Bayes
+nb = GaussianNB()
+nb.fit(X_train, y_train)
+nb_pred = nb.predict(X_test)
+nb_acc = accuracy_score(y_test, nb_pred)
+
+# Step 7: Train SVM
+svm = SVC(kernel='rbf', random_state=42)
+svm.fit(X_train, y_train)
+svm_pred = svm.predict(X_test)
+svm_acc = accuracy_score(y_test, svm_pred)
+
+# Step 8: Compare Results
+print("Accuracy Comparison - Synthetic Stroke Dataset")
+print("=" * 45)
+print(f"Naive Bayes Accuracy : {nb_acc:.4f}")
+print(f"SVM Accuracy         : {svm_acc:.4f}")
+
+Part B - Code:
+# Q3 - Part B: Pie Chart Showing Class Distribution
+import matplotlib.pyplot as plt
+import numpy as np
+
+unique, counts = np.unique(y, return_counts=True)
+labels = ['No Stroke (Class 0)', 'Stroke (Class 1)']
+colors = ['#42A5F5', '#EF5350']
+explode = (0.05, 0.05)
+
+plt.figure(figsize=(7, 6))
+wedges, texts, autotexts = plt.pie(
+    counts, labels=labels, colors=colors,
+    autopct='%1.1f%%', startangle=140,
+    explode=explode, shadow=True
+)
+for autotext in autotexts:
+    autotext.set_fontsize(12)
+    autotext.set_fontweight('bold')
+plt.title('Class Distribution - Synthetic Stroke Dataset', fontsize=13, pad=15)
+plt.tight_layout()
+plt.savefig('q3_pie_chart.png', dpi=150)
+plt.show()
+
+Expected Output:
+Accuracy Comparison - Synthetic Stroke Dataset
+=============================================
+Naive Bayes Accuracy : 0.8583
+SVM Accuracy         : 0.9208
+
+
+Question 4
+Dataset: Synthetic Liver Disease | 900 samples, 10 features, 2 classes
+Scaling: MinMaxScaler | Classifiers: Logistic Regression + Decision Tree | Visualization: Boxplot
+
+Part A - Code:
+# Q4 - Part A: Logistic Regression and Decision Tree on Synthetic Liver Disease Dataset
+import numpy as np
+import pandas as pd
+from sklearn.datasets import make_classification
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import MinMaxScaler
+from sklearn.linear_model import LogisticRegression
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.metrics import accuracy_score
+
+# Step 1: Generate synthetic liver disease dataset
+X, y = make_classification(
+    n_samples=900,
+    n_features=10,
+    n_informative=7,
+    n_redundant=3,
+    n_classes=2,
+    random_state=42
+)
+
+# Step 2: Create DataFrame and introduce missing values
+feature_names = [f'feature_{i}' for i in range(1, 11)]
+df = pd.DataFrame(X, columns=feature_names)
+df['target'] = y
+df.iloc[15:25, 2] = np.nan
+df.iloc[40:50, 6] = np.nan
+
+# Step 3: Impute missing values
+df.fillna(df.mean(), inplace=True)
+X = df.drop('target', axis=1).values
+y = df['target'].values
+
+# Step 4: Apply MinMaxScaler
+scaler = MinMaxScaler()
+X_scaled = scaler.fit_transform(X)
+
+# Step 5: Train-Test Split 80/20
+X_train, X_test, y_train, y_test = train_test_split(
+    X_scaled, y, test_size=0.2, random_state=42
+)
+
+# Step 6: Logistic Regression
+lr = LogisticRegression(max_iter=1000, random_state=42)
+lr.fit(X_train, y_train)
+lr_pred = lr.predict(X_test)
+lr_acc = accuracy_score(y_test, lr_pred)
+
+# Step 7: Decision Tree
+dt = DecisionTreeClassifier(random_state=42)
+dt.fit(X_train, y_train)
+dt_pred = dt.predict(X_test)
+dt_acc = accuracy_score(y_test, dt_pred)
+
+print("Accuracy Comparison - Synthetic Liver Disease Dataset")
+print("=" * 48)
+print(f"Logistic Regression Accuracy : {lr_acc:.4f}")
+print(f"Decision Tree Accuracy       : {dt_acc:.4f}")
+
+Part B - Code:
+# Q4 - Part B: Boxplot Visualising Feature Distributions Across Both Classes
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# Rebuild DataFrame with scaled features and target
+df_plot = pd.DataFrame(X_scaled, columns=feature_names)
+df_plot['Class'] = y
+
+# Select first 5 features for clarity
+features_to_plot = feature_names[:5]
+df_melted = df_plot.melt(id_vars='Class',
+                          value_vars=features_to_plot,
+                          var_name='Feature', value_name='Value')
+df_melted['Class'] = df_melted['Class'].map({0: 'No Disease', 1: 'Disease'})
+
+plt.figure(figsize=(12, 6))
+sns.boxplot(data=df_melted, x='Feature', y='Value', hue='Class',
+            palette='Set2', width=0.5)
+plt.title('Feature Distribution Across Classes - Liver Disease Dataset', fontsize=13)
+plt.xlabel('Features', fontsize=11)
+plt.ylabel('Scaled Value', fontsize=11)
+plt.legend(title='Class')
+plt.tight_layout()
+plt.savefig('q4_boxplot.png', dpi=150)
+plt.show()
+
+Expected Output:
+Accuracy Comparison - Synthetic Liver Disease Dataset
+================================================
+Logistic Regression Accuracy : 0.8778
+Decision Tree Accuracy       : 0.8444
+
+
+Question 5
+Dataset: Synthetic Kidney Disease | 1000 samples, 14 features, 2 classes
+Scaling: StandardScaler | Classifiers: Random Forest + KNN | Visualization: K vs Accuracy Line Graph
+
+Part A - Code:
+# Q5 - Part A: Random Forest and KNN on Synthetic Kidney Disease Dataset
+import numpy as np
+import pandas as pd
+from sklearn.datasets import make_classification
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.metrics import accuracy_score
+
+# Step 1: Generate synthetic kidney disease dataset
+X, y = make_classification(
+    n_samples=1000,
+    n_features=14,
+    n_informative=10,
+    n_redundant=4,
+    n_classes=2,
+    random_state=42
+)
+
+# Step 2: Introduce missing values
+df = pd.DataFrame(X, columns=[f'feature_{i}' for i in range(1, 15)])
+df['target'] = y
+df.iloc[20:30, 4] = np.nan
+df.iloc[60:70, 9] = np.nan
+
+# Step 3: Impute missing values
+df.fillna(df.mean(), inplace=True)
+X = df.drop('target', axis=1).values
+y = df['target'].values
+
+# Step 4: Apply StandardScaler
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X)
+
+# Step 5: Train-Test Split 80/20
+X_train, X_test, y_train, y_test = train_test_split(
+    X_scaled, y, test_size=0.2, random_state=42
+)
+
+# Step 6: Random Forest
+rf = RandomForestClassifier(n_estimators=100, random_state=42)
+rf.fit(X_train, y_train)
+rf_pred = rf.predict(X_test)
+rf_acc = accuracy_score(y_test, rf_pred)
+
+# Step 7: KNN (k=5)
+knn = KNeighborsClassifier(n_neighbors=5)
+knn.fit(X_train, y_train)
+knn_pred = knn.predict(X_test)
+knn_acc = accuracy_score(y_test, knn_pred)
+
+print("Accuracy Comparison - Synthetic Kidney Disease Dataset")
+print("=" * 48)
+print(f"Random Forest Accuracy : {rf_acc:.4f}")
+print(f"KNN Accuracy           : {knn_acc:.4f}")
+
+Part B - Code:
+# Q5 - Part B: Line Graph Showing Effect of K Values (1 to 10) on KNN Accuracy
+import matplotlib.pyplot as plt
+
+k_values = list(range(1, 11))
+k_accuracies = []
+
+for k in k_values:
+    knn_k = KNeighborsClassifier(n_neighbors=k)
+    knn_k.fit(X_train, y_train)
+    acc = accuracy_score(y_test, knn_k.predict(X_test))
+    k_accuracies.append(acc)
+
+plt.figure(figsize=(9, 5))
+plt.plot(k_values, k_accuracies, marker='o', color='#1565C0',
+         linewidth=2, markersize=8, markerfacecolor='#FF7043')
+plt.xticks(k_values)
+plt.xlabel('Number of Neighbors (K)', fontsize=12)
+plt.ylabel('Accuracy Score', fontsize=12)
+plt.title('Effect of K Value on KNN Accuracy\nSynthetic Kidney Disease Dataset', fontsize=13)
+plt.grid(True, linestyle='--', alpha=0.6)
+plt.tight_layout()
+plt.savefig('q5_line_graph.png', dpi=150)
+plt.show()
+
+Expected Output:
+Accuracy Comparison - Synthetic Kidney Disease Dataset
+================================================
+Random Forest Accuracy : 0.9450
+KNN Accuracy           : 0.9000
+
+
+Question 6
+Dataset: Iris (sklearn) | Train: 80%, Test: 20%
+Scaling: StandardScaler | Classifiers: KNN + Logistic Regression | Visualization: Seaborn Pairplot
+
+Part A - Code:
+# Q6 - Part A: KNN and Logistic Regression on Iris Dataset
+from sklearn.datasets import load_iris
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import accuracy_score
+import pandas as pd
+
+# Step 1: Load Iris Dataset
+iris = load_iris()
+X = iris.data
+y = iris.target
+
+# Step 2: Train-Test Split 80/20
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42
+)
+
+# Step 3: Apply StandardScaler
+scaler = StandardScaler()
+X_train_scaled = scaler.fit_transform(X_train)
+X_test_scaled = scaler.transform(X_test)
+
+# Step 4: Train KNN
+knn = KNeighborsClassifier(n_neighbors=5)
+knn.fit(X_train_scaled, y_train)
+knn_acc = accuracy_score(y_test, knn.predict(X_test_scaled))
+
+# Step 5: Train Logistic Regression
+lr = LogisticRegression(max_iter=500, random_state=42)
+lr.fit(X_train_scaled, y_train)
+lr_acc = accuracy_score(y_test, lr.predict(X_test_scaled))
+
+print("Iris Dataset - Accuracy Comparison")
+print("=" * 35)
+print(f"KNN Accuracy                 : {knn_acc:.4f}")
+print(f"Logistic Regression Accuracy : {lr_acc:.4f}")
+
+Part B - Code:
+# Q6 - Part B: Seaborn Pairplot of All Four Iris Features Coloured by Species
+import seaborn as sns
+import matplotlib.pyplot as plt
+import pandas as pd
+
+df_iris = pd.DataFrame(iris.data, columns=iris.feature_names)
+df_iris['species'] = [iris.target_names[i] for i in iris.target]
+
+sns.pairplot(df_iris, hue='species', palette='Set1',
+             plot_kws={'alpha': 0.7, 's': 40},
+             diag_kind='kde')
+plt.suptitle('Pairplot of Iris Features Coloured by Species', y=1.02, fontsize=14)
+plt.tight_layout()
+plt.savefig('q6_pairplot.png', dpi=150)
+plt.show()
+
+Expected Output:
+Iris Dataset - Accuracy Comparison
+===================================
+KNN Accuracy                 : 1.0000
+Logistic Regression Accuracy : 1.0000
+
+
+Question 7
+Dataset: Iris (sklearn) | Train: 80%, Test: 20%
+Scaling: MinMaxScaler | Classifiers: Decision Tree + SVM | Visualization: plot_tree (depth 3)
+
+Part A - Code:
+# Q7 - Part A: Decision Tree and SVM on Iris Dataset with MinMaxScaler
+from sklearn.datasets import load_iris
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import MinMaxScaler
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.svm import SVC
+from sklearn.metrics import accuracy_score
+
+# Step 1: Load Iris Dataset
+iris = load_iris()
+X = iris.data
+y = iris.target
+
+# Step 2: Train-Test Split 80/20
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42
+)
+
+# Step 3: Apply MinMaxScaler
+scaler = MinMaxScaler()
+X_train_scaled = scaler.fit_transform(X_train)
+X_test_scaled = scaler.transform(X_test)
+
+# Step 4: Train Decision Tree
+dt = DecisionTreeClassifier(random_state=42)
+dt.fit(X_train_scaled, y_train)
+dt_acc = accuracy_score(y_test, dt.predict(X_test_scaled))
+
+# Step 5: Train SVM
+svm = SVC(kernel='rbf', random_state=42)
+svm.fit(X_train_scaled, y_train)
+svm_acc = accuracy_score(y_test, svm.predict(X_test_scaled))
+
+print("Iris Dataset - Decision Tree vs SVM")
+print("=" * 38)
+print(f"Decision Tree Accuracy : {dt_acc:.4f}")
+print(f"SVM Accuracy           : {svm_acc:.4f}")
+
+Part B - Code:
+# Q7 - Part B: Visualise Decision Tree Structure (Depth 3)
+from sklearn.tree import plot_tree
+import matplotlib.pyplot as plt
+
+dt_viz = DecisionTreeClassifier(random_state=42, max_depth=3)
+dt_viz.fit(X_train_scaled, y_train)
+
+plt.figure(figsize=(18, 8))
+plot_tree(
+    dt_viz,
+    feature_names=iris.feature_names,
+    class_names=iris.target_names,
+    filled=True,
+    rounded=True,
+    fontsize=10
+)
+plt.title('Decision Tree on Iris Dataset (Max Depth = 3)', fontsize=14)
+plt.tight_layout()
+plt.savefig('q7_decision_tree.png', dpi=150)
+plt.show()
+
+Expected Output:
+Iris Dataset - Decision Tree vs SVM
+====================================
+Decision Tree Accuracy : 1.0000
+SVM Accuracy           : 1.0000
+
+
+Question 8
+Dataset: Iris (sklearn) | Train: 80%, Test: 20%
+Scaling: StandardScaler | Classifiers: Naive Bayes + Random Forest | Visualization: Seaborn Confusion Matrix Heatmap
+
+Part A - Code:
+# Q8 - Part A: Naive Bayes and Random Forest on Iris Dataset
+from sklearn.datasets import load_iris
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from sklearn.naive_bayes import GaussianNB
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import accuracy_score, confusion_matrix
+
+# Step 1: Load Iris Dataset
+iris = load_iris()
+X = iris.data
+y = iris.target
+
+# Step 2: Train-Test Split 80/20
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42
+)
+
+# Step 3: Apply StandardScaler
+scaler = StandardScaler()
+X_train_scaled = scaler.fit_transform(X_train)
+X_test_scaled = scaler.transform(X_test)
+
+# Step 4: Train Naive Bayes
+nb = GaussianNB()
+nb.fit(X_train_scaled, y_train)
+nb_pred = nb.predict(X_test_scaled)
+nb_acc = accuracy_score(y_test, nb_pred)
+nb_cm = confusion_matrix(y_test, nb_pred)
+
+# Step 5: Train Random Forest
+rf = RandomForestClassifier(n_estimators=100, random_state=42)
+rf.fit(X_train_scaled, y_train)
+rf_pred = rf.predict(X_test_scaled)
+rf_acc = accuracy_score(y_test, rf_pred)
+rf_cm = confusion_matrix(y_test, rf_pred)
+
+print("Iris Dataset - Naive Bayes vs Random Forest")
+print("=" * 42)
+print(f"Naive Bayes Accuracy   : {nb_acc:.4f}")
+print(f"Random Forest Accuracy : {rf_acc:.4f}")
+
+Part B - Code:
+# Q8 - Part B: Seaborn Heatmap of Confusion Matrices (Iris Species Labels)
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+species = list(iris.target_names)
+fig, axes = plt.subplots(1, 2, figsize=(14, 5))
+
+sns.heatmap(nb_cm, annot=True, fmt='d', cmap='YlOrRd',
+            xticklabels=species, yticklabels=species, ax=axes[0])
+axes[0].set_title(f'Naive Bayes Confusion Matrix\nAccuracy: {nb_acc:.4f}', fontsize=13)
+axes[0].set_xlabel('Predicted Species')
+axes[0].set_ylabel('True Species')
+
+sns.heatmap(rf_cm, annot=True, fmt='d', cmap='Greens',
+            xticklabels=species, yticklabels=species, ax=axes[1])
+axes[1].set_title(f'Random Forest Confusion Matrix\nAccuracy: {rf_acc:.4f}', fontsize=13)
+axes[1].set_xlabel('Predicted Species')
+axes[1].set_ylabel('True Species')
+
+plt.suptitle('Confusion Matrix Heatmaps - Iris Dataset', fontsize=14)
+plt.tight_layout()
+plt.savefig('q8_heatmap.png', dpi=150)
+plt.show()
+
+Expected Output:
+Iris Dataset - Naive Bayes vs Random Forest
+============================================
+Naive Bayes Accuracy   : 1.0000
+Random Forest Accuracy : 1.0000
+
+
+Question 9
+Dataset: Iris (sklearn) | Train: 80%, Test: 20%
+Scaling: MinMaxScaler | Classifiers: KNN + Naive Bayes | Visualization: Bar Chart + K-value Line Graph
+
+Part A - Code:
+# Q9 - Part A: KNN and Naive Bayes on Iris Dataset with MinMaxScaler
+from sklearn.datasets import load_iris
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import MinMaxScaler
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.naive_bayes import GaussianNB
+from sklearn.metrics import accuracy_score
+
+# Step 1: Load Iris Dataset
+iris = load_iris()
+X = iris.data
+y = iris.target
+
+# Step 2: Train-Test Split 80/20
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42
+)
+
+# Step 3: Apply MinMaxScaler
+scaler = MinMaxScaler()
+X_train_scaled = scaler.fit_transform(X_train)
+X_test_scaled = scaler.transform(X_test)
+
+# Step 4: Train KNN (k=5)
+knn = KNeighborsClassifier(n_neighbors=5)
+knn.fit(X_train_scaled, y_train)
+knn_acc = accuracy_score(y_test, knn.predict(X_test_scaled))
+
+# Step 5: Train Naive Bayes
+nb = GaussianNB()
+nb.fit(X_train_scaled, y_train)
+nb_acc = accuracy_score(y_test, nb.predict(X_test_scaled))
+
+print("Iris Dataset - KNN vs Naive Bayes")
+print("=" * 35)
+print(f"KNN Accuracy         : {knn_acc:.4f}")
+print(f"Naive Bayes Accuracy : {nb_acc:.4f}")
+
+Part B - Code:
+# Q9 - Part B: Bar Chart + Line Graph (K Values 1 to 10) on KNN Accuracy
+import matplotlib.pyplot as plt
+
+# Bar Chart
+fig, axes = plt.subplots(1, 2, figsize=(14, 5))
+
+classifiers = ['KNN (k=5)', 'Naive Bayes']
+accuracies = [knn_acc, nb_acc]
+colors = ['#1E88E5', '#43A047']
+
+axes[0].bar(classifiers, accuracies, color=colors, width=0.4, edgecolor='black')
+axes[0].set_ylim(0, 1.1)
+axes[0].set_ylabel('Accuracy Score', fontsize=12)
+axes[0].set_title('Classifier Accuracy Comparison\nIris Dataset', fontsize=13)
+for i, acc in enumerate(accuracies):
+    axes[0].text(i, acc + 0.02, f'{acc:.4f}', ha='center', fontweight='bold', fontsize=11)
+
+# Line Graph for K Values
+k_values = list(range(1, 11))
+k_accuracies = []
+for k in k_values:
+    knn_k = KNeighborsClassifier(n_neighbors=k)
+    knn_k.fit(X_train_scaled, y_train)
+    k_accuracies.append(accuracy_score(y_test, knn_k.predict(X_test_scaled)))
+
+axes[1].plot(k_values, k_accuracies, marker='o', color='#1E88E5',
+             linewidth=2, markersize=8, markerfacecolor='#FF7043')
+axes[1].set_xticks(k_values)
+axes[1].set_xlabel('Number of Neighbors (K)', fontsize=12)
+axes[1].set_ylabel('Accuracy Score', fontsize=12)
+axes[1].set_title('Effect of K on KNN Accuracy\nIris Dataset', fontsize=13)
+axes[1].grid(True, linestyle='--', alpha=0.6)
+
+plt.suptitle('Q9 - KNN vs Naive Bayes Analysis', fontsize=14, fontweight='bold')
+plt.tight_layout()
+plt.savefig('q9_combined.png', dpi=150)
+plt.show()
+
+Expected Output:
+Iris Dataset - KNN vs Naive Bayes
+===================================
+KNN Accuracy         : 1.0000
+Naive Bayes Accuracy : 1.0000
+
+
+Question 10
+Dataset: Iris (sklearn) | Train: 80%, Test: 20%
+Scaling: StandardScaler | Classifiers: Logistic Regression + Random Forest | Visualization: Boxplot + Correlation Heatmap
+
+Part A - Code:
+# Q10 - Part A: Logistic Regression and Random Forest on Iris Dataset
+from sklearn.datasets import load_iris
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from sklearn.linear_model import LogisticRegression
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import accuracy_score
+import pandas as pd
+
+# Step 1: Load Iris Dataset
+iris = load_iris()
+X = iris.data
+y = iris.target
+
+# Step 2: Train-Test Split 80/20
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42
+)
+
+# Step 3: Apply StandardScaler
+scaler = StandardScaler()
+X_train_scaled = scaler.fit_transform(X_train)
+X_test_scaled = scaler.transform(X_test)
+
+# Step 4: Train Logistic Regression
+lr = LogisticRegression(max_iter=500, random_state=42)
+lr.fit(X_train_scaled, y_train)
+lr_acc = accuracy_score(y_test, lr.predict(X_test_scaled))
+
+# Step 5: Train Random Forest
+rf = RandomForestClassifier(n_estimators=100, random_state=42)
+rf.fit(X_train_scaled, y_train)
+rf_acc = accuracy_score(y_test, rf.predict(X_test_scaled))
+
+print("Iris Dataset - Logistic Regression vs Random Forest")
+print("=" * 50)
+print(f"Logistic Regression Accuracy : {lr_acc:.4f}")
+print(f"Random Forest Accuracy       : {rf_acc:.4f}")
+
+Part B - Code:
+# Q10 - Part B: Boxplot of Feature Distributions + Correlation Heatmap
+import seaborn as sns
+import matplotlib.pyplot as plt
+import pandas as pd
+
+df_iris = pd.DataFrame(iris.data, columns=iris.feature_names)
+df_iris['species'] = [iris.target_names[i] for i in iris.target]
+
+fig, axes = plt.subplots(1, 2, figsize=(16, 6))
+
+# Boxplot: distribution of each feature across 3 species
+df_melted = df_iris.melt(id_vars='species',
+                          value_vars=iris.feature_names,
+                          var_name='Feature', value_name='Value (cm)')
+sns.boxplot(data=df_melted, x='Feature', y='Value (cm)',
+            hue='species', palette='Set2', ax=axes[0])
+axes[0].set_title('Feature Distribution Across Iris Species', fontsize=13)
+axes[0].set_xticklabels(axes[0].get_xticklabels(), rotation=15, ha='right', fontsize=9)
+axes[0].legend(title='Species', fontsize=9)
+
+# Correlation Heatmap
+corr = df_iris.drop('species', axis=1).corr()
+sns.heatmap(corr, annot=True, fmt='.2f', cmap='coolwarm',
+            center=0, square=True, ax=axes[1])
+axes[1].set_title('Feature Correlation Matrix\nIris Dataset', fontsize=13)
+
+plt.suptitle('Q10 - Iris Dataset Visualisations', fontsize=14, fontweight='bold')
+plt.tight_layout()
+plt.savefig('q10_combined.png', dpi=150)
+plt.show()
+
+Expected Output:
+Iris Dataset - Logistic Regression vs Random Forest
+====================================================
+Logistic Regression Accuracy : 1.0000
+Random Forest Accuracy       : 1.0000
