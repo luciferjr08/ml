@@ -1,0 +1,68 @@
+=========================
+PART A - UNIVERSAL TEMPLATE
+=========================
+
+1. Import libraries
+import numpy as np
+import pandas as pd
+from sklearn.datasets import make_classification
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler, MinMaxScaler
+from sklearn.impute import SimpleImputer
+from sklearn.metrics import accuracy_score
+
+2. Generate synthetic dataset
+X, y = make_classification(
+n_samples=1000, # change based on question
+n_features=10, # change
+n_classes=2,
+random_state=42
+)
+
+Convert to DataFrame (easy handling)
+df = pd.DataFrame(X)
+
+3. Introduce missing values
+df.iloc[0:10, 0] = np.nan
+
+4. Handle missing values (mean)
+imputer = SimpleImputer(strategy='mean')
+X = imputer.fit_transform(df)
+
+5. Scaling (CHANGE based on question)
+scaler = StandardScaler() # or MinMaxScaler()
+X = scaler.fit_transform(X)
+
+6. Train-test split (80:20)
+X_train, X_test, y_train, y_test = train_test_split(
+X, y, test_size=0.2, random_state=42
+)
+
+=========================
+7. MODELS (CHANGE HERE ONLY)
+=========================
+
+Example models (change based on question)
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.linear_model import LogisticRegression
+
+model1 = KNeighborsClassifier(n_neighbors=5)
+model2 = LogisticRegression(max_iter=200)
+
+Train
+model1.fit(X_train, y_train)
+model2.fit(X_train, y_train)
+
+Predict
+y_pred1 = model1.predict(X_test)
+y_pred2 = model2.predict(X_test)
+
+=========================
+8. Evaluation
+=========================
+
+acc1 = accuracy_score(y_test, y_pred1)
+acc2 = accuracy_score(y_test, y_pred2)
+
+print("Model 1 Accuracy:", acc1)
+print("Model 2 Accuracy:", acc2)

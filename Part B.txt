@@ -1,0 +1,138 @@
+Perfect 👍 this is exactly what you need for PART B.
+
+I’ll give you a clean graph template for EACH type (you just copy based on question).
+
+───
+
+🎯 🧠 RULE FIRST
+
+👉 Graph always uses:
+
+• acc1, acc2 → for comparison
+• y_test, y_pred → for confusion matrix
+• X, y → for dataset plots
+
+───
+
+✅ 🔥 1. BAR CHART (Q1, Q9)
+
+👉 Compare accuracies
+
+python
+import matplotlib.pyplot as plt
+
+models = ['Model1', 'Model2']
+accuracies = [acc1, acc2]
+
+plt.bar(models, accuracies)
+plt.xlabel("Models")
+plt.ylabel("Accuracy")
+plt.title("Model Comparison")
+plt.show()
+
+
+───
+
+✅ 🔥 2. HEATMAP (Confusion Matrix) (Q2, Q8)
+
+python
+import seaborn as sns
+from sklearn.metrics import confusion_matrix
+
+cm = confusion_matrix(y_test, y_pred1)
+
+sns.heatmap(cm, annot=True, fmt='d', cmap='Blues')
+plt.xlabel("Predicted")
+plt.ylabel("Actual")
+plt.title("Confusion Matrix")
+plt.show()
+
+
+───
+
+✅ 🔥 3. PIE CHART (Q3)
+
+👉 Class distribution
+
+python
+import matplotlib.pyplot as plt
+import numpy as np
+
+unique, counts = np.unique(y, return_counts=True)
+
+plt.pie(counts, labels=unique, autopct='%1.1f%%')
+plt.title("Class Distribution")
+plt.show()
+
+
+───
+
+✅ 🔥 4. BOXPLOT (Q4, Q10)
+
+python
+import seaborn as sns
+import pandas as pd
+
+df = pd.DataFrame(X)
+df['target'] = y
+
+sns.boxplot(x='target', y=df.columns[0], data=df)
+plt.title("Boxplot")
+plt.show()
+
+
+───
+
+✅ 🔥 5. LINE GRAPH (Q5, Q9)
+
+👉 K value vs accuracy
+
+python
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.metrics import accuracy_score
+
+k_values = range(1, 11)
+accuracies = []
+
+for k in k_values:
+    model = KNeighborsClassifier(n_neighbors=k)
+    model.fit(X_train, y_train)
+    y_pred = model.predict(X_test)
+    accuracies.append(accuracy_score(y_test, y_pred))
+
+plt.plot(k_values, accuracies)
+plt.xlabel("K values")
+plt.ylabel("Accuracy")
+plt.title("K vs Accuracy")
+plt.show()
+
+
+───
+
+✅ 🔥 6. PAIRPLOT (Q6)
+
+python
+import seaborn as sns
+import pandas as pd
+
+df = pd.DataFrame(X, columns=['f1','f2','f3','f4'])
+df['target'] = y
+
+sns.pairplot(df, hue='target')
+plt.show()
+
+
+───
+
+🎯 FINAL MEMORY SHORTCUT
+
+text
+Bar → compare models
+Heatmap → confusion matrix
+Pie → class distribution
+Boxplot → feature distribution
+Line → K vs accuracy
+Pairplot → iris visualization
+
+
+───
